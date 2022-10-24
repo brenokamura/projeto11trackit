@@ -53,7 +53,7 @@ export default function Footer() {
 
     return(
         <Content>
-            <Button><Link to={"/habitos"}>Hábitos</Link></Button>
+            <Button><Link to={"/habitos"} data-identifier="habit-page-action">Hábitos</Link></Button>
             <Progress>
                 <Link to={"/hoje"}>
                     <CircularProgressbar 
@@ -70,7 +70,7 @@ export default function Footer() {
                     />
                 </Link>
             </Progress>
-            <Button><Link to={"/historico"}>Histórico</Link></Button>
+            <Button><Link to={"/historico"} data-identifier="historic-page-action">Histórico</Link></Button>
         </Content>
     )
 }

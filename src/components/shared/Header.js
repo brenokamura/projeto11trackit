@@ -23,7 +23,7 @@ function Top({ pfp, display, setDisplay, logOff }) {
         <Content>
             <Logo src={header} alt="logo" />
             <Profile>
-                <img src={pfp} onClick={() => setDisplay(!display)} alt={altPfp} />
+                <img data-identifier="avatar" src={pfp} onClick={() => setDisplay(!display)} alt={altPfp} />
                 <Dropdown />
             </Profile>
         </Content>

@@ -30,7 +30,7 @@ function Task({ handleCheck, index, task }) {
                 <Streak>Sequencia atual: {<Template color={done} num={sequence} />}</Streak>
                 <Streak>Seu recorde: {<Template color={color()} num={highest} />}</Streak>
             </Card>
-            <Icon colorPicker={done}><ion-icon onClick={() => handleCheck(index)} name="checkbox"></ion-icon></Icon>
+            <Icon data-identifier="done-habit-btn" colorPicker={done}><ion-icon data-identifier="done-habit-btn" onClick={() => handleCheck(index)} name="checkbox"></ion-icon></Icon>
         </CardWrapper>
     )
 }
@@ -129,7 +129,7 @@ export default function Track() {
         else {
             return (
                 data.map((task, index) => 
-                    <Task 
+                    <Task data-identifier="today-infos"
                         key={index}
                         task={task}
                         index={index}
@@ -139,7 +139,7 @@ export default function Track() {
     })
 
     return(
-    <Content>
+    <Content data-identifier="today-infos">
         <Header />
         <PageTop>
             <PageTitle>{calendar}</PageTitle>

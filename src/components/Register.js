@@ -1,65 +1,46 @@
-import { Link, useNavigate } from "react-router-dom"
-import { useState, useEffect, useContext } from "react";
-import { ThreeDots } from "react-loader-spinner";
-
 import axios from "axios";
 import styled from "styled-components";
+import { ThreeDots } from "react-loader-spinner";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/trackit_logo.png"
-import UserContext from "./context/UserContext";
 
-const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/login"
+const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up"
 
-export default function Home() {
-    const { setUserContext } = useContext(UserContext);
+export default function Register() {
     const navigate = useNavigate();
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [userName, setUserName] = useState('')
+    const [picture, setPicture] = useState('')
     const [interact, setInteract] = useState(true)
 
-    useEffect(() => {
-        setUserContext({})
-        const autoLogin = localStorage.getItem("login");
-        if (autoLogin !== null) {
-            const parseUser = JSON.parse(autoLogin)
-            setEmail(parseUser.email)
-            setPassword(parseUser.password)
-            const login = { email: parseUser.email, password: parseUser.password }
-            userLogin(login);
-        }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
-
-    function handleSubmit(e) {
+    function userRegister(e) {
         e.preventDefault();
         e.target.blur();
-        const login = { email: email, password: password }
-        userLogin(login);
-    }
-
-    function userLogin(login) {
-        const promise = axios.post(URL, login)
+        const registry = { email: email, name: userName, image: picture, password: password }
         setInteract(false)
+
+        const promise = axios.post(URL, registry);
+
         promise.then((res) => {
-            setUserContext( {
-                token: res.data.token,
-                image: res.data.image,
-            })
-            const user = JSON.stringify(res.data)
-            localStorage.setItem("login", user)
-            navigate("/hoje")
-        })
-        promise.catch((err) => { alert(err.response.data.message); toggleInputs(); })
+            toggleInputs();
+            navigate("/")
+        });
+        promise.catch((err) => { alert(err.response.data.message); setEmail(''); setInteract(true); });
     }
 
     function toggleInputs() {
         setInteract(true);
         setEmail('');
         setPassword('');
+        setUserName('');
+        setPicture('');
     }
 
     const IsLoading = (() => {
         if(interact) {
-            return (<Button type={'submit'} interact={interact}>Entrar</Button>)
+            return (<Button type={'submit'} interact={interact}>Cadastrar</Button>)
         }
         return <Button><ThreeDots height="15px" width="60px" color="#FFFFFF" /></Button>
     })
@@ -67,26 +48,41 @@ export default function Home() {
     return (
         <Container>
             <Logo src={logo} alt="Logotipo da aplicação" />
-            <InputWrapper onSubmit={handleSubmit} interact={interact}>
-                <input
+            <InputWrapper onSubmit={userRegister}>
+                <input data-identifier="input-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type={'email'}
                     placeholder='email'
                     required
                 />
-                <input
+                <input data-identifier="input-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     type={'password'}
                     placeholder='senha'
                     required
                 />
+                <input data-identifier="input-name"
+                    value={userName}
+                    onChange={(e) => setUserName(e.target.value)}
+                    type={'text'}
+                    placeholder='nome'
+                    required
+                />
+                <input data-identifier="input-photo"
+                    value={picture}
+                    onChange={(e) => setPicture(e.target.value)}
+                    type={'text'}
+                    placeholder='foto'
+                    pattern={"^https?://(?:[a-z-]+.)+[a-z]{2,6}(?:/[^/#?]+)+.(?:jpe?g|gif|png)$"}
+                    title={"Link de imagem terminado com formato de imagem (jpg, png, etc.)"}
+                    required
+                />
                 <IsLoading />
             </InputWrapper>
-            <Text><Link to="/cadastro">Não tem uma conta? cadastre-se</Link></Text>
-        </Container>
-    )
+            <Text><Link to="/" data-identifier="back-to-login-action">Já tem uma conta? Faça login</Link></Text>
+        </Container>)
 }
 
 const Container = styled.div`
@@ -111,9 +107,9 @@ const InputWrapper = styled.form`
     box-sizing: border-box;
     input {
         display: flex;
-        pointer-events: ${ ({ interact }) => interact ? 'auto' : 'none' };
-        background-color: ${ ({ interact }) => interact ? '#FFFFFF' : '#F2F2F2' };
-        color: ${ ({ interact }) => interact ? '#666666' : '#AFAFAF' };
+        pointer-events: ${ ({ interact }) => !interact ? 'auto' : 'none' };
+        background-color: ${ ({ interact }) => !interact ? '#FFFFFF' : '#F2F2F2' };
+        color: ${ ({ interact }) => !interact ? '#666666' : '#AFAFAF' };
         width: 100%;
         height: 40px;
         margin: 5px 0;
@@ -122,7 +118,7 @@ const InputWrapper = styled.form`
         border-radius: 5px;
         box-sizing: border-box;
         &::placeholder {
-        	font-family: 'Lexend Deca';
+            font-family: 'Lexend Deca';
             font-size: 20px;
             color: #DBDBDB
         }

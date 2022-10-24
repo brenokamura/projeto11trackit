@@ -59,7 +59,7 @@ export default function Home() {
 
     const IsLoading = (() => {
         if(interact) {
-            return (<Button type={'submit'} interact={interact}>Entrar</Button>)
+            return (<Button data-identifier="login-btn" type={'submit'} interact={interact}>Entrar</Button>)
         }
         return <Button><ThreeDots height="15px" width="60px" color="#FFFFFF" /></Button>
     })
@@ -68,14 +68,14 @@ export default function Home() {
         <Container>
             <Logo src={logo} alt="Logotipo da aplicação" />
             <InputWrapper onSubmit={handleSubmit} interact={interact}>
-                <input
+                <input data-identifier="input-email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     type={'email'}
                     placeholder='email'
                     required
                 />
-                <input
+                <input data-identifier="input-password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     type={'password'}
@@ -84,7 +84,7 @@ export default function Home() {
                 />
                 <IsLoading />
             </InputWrapper>
-            <Text><Link to="/cadastro">Não tem uma conta? cadastre-se</Link></Text>
+            <Text><Link to="/cadastro" data-identifier="sign-up-action">Não tem uma conta? cadastre-se</Link></Text>
         </Container>
     )
 }

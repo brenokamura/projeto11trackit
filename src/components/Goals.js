@@ -18,7 +18,7 @@ const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits"
 function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, setCreate, handleSubmit, interact }) {
     return(
         <InputWrapper onSubmit={handleSubmit} interact={interact}>
-            <input
+            <input data-identifier="input-habit-name"
                 type={'text'}
                 value={title}
                 placeholder={'nome do hábito'}
@@ -29,7 +29,7 @@ function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, se
             <DayWrapper>
                 { 
                     form.map((item, index) =>
-                        <Day 
+                        <Day data-identifier="week-day-btn"
                             key={index}
                             select={item.isSelected}
                             index={index}
@@ -38,8 +38,8 @@ function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, se
                         </Day>
                 )}
             </DayWrapper>
-            <ButtonWrapper>
-                <Cancel onClick={() => setCreate(!create)}>cancelar</Cancel>
+            <ButtonWrapper >
+                <Cancel data-identifier="cancel-habit-create-btn" onClick={() => setCreate(!create)}>cancelar</Cancel>
                 { <IsLoading /> }
             </ButtonWrapper>
         </InputWrapper>
@@ -146,7 +146,7 @@ export default function Goals() {
 
     const IsLoading = (() => {
         if(interact) {
-            return (<Button type={'submit'} interact={interact}>Salvar</Button>)
+            return (<Button data-identifier="save-habit-create-btn" type={'submit'} interact={interact}>Salvar</Button>)
         }
         return <Button><ThreeDots height="10px" width="45px" color="#FFFFFF" /></Button>
     })
@@ -193,9 +193,9 @@ export default function Goals() {
         if(data.length > 0) {
             return (data.map((item, index) => 
             <CardWrapper key={index}>
-                <Card>{item.name}
+                <Card data-identifier="habit-name">{item.name}
                     <DelIcon>
-                        <ion-icon onClick={() => handleDelete(item.id)}
+                        <ion-icon data-identifier="delete-habit-btn" onClick={() => handleDelete(item.id)}
                             name="trash-outline">
                         </ion-icon>
                     </DelIcon>
@@ -205,7 +205,7 @@ export default function Goals() {
                 </DayWrapper>
             </CardWrapper>))
         }
-        return (<Template>Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</Template>)  
+        return (<Template data-identifier="no-habit-message">Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</Template>)  
     })
 
     return (
@@ -213,7 +213,7 @@ export default function Goals() {
             <Header />
             <PageTop>
                 <PageTitle>Meus hábitos</PageTitle>
-                <AddIcon><ion-icon onClick={() => setCreate(!create)} name="add-outline"></ion-icon></AddIcon>
+                <AddIcon><ion-icon data-identifier="create-habit-btn" onClick={() => setCreate(!create)} name="add-outline"></ion-icon></AddIcon>
             </PageTop>
             <List>
                 {
