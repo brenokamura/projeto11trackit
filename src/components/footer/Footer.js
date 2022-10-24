@@ -52,9 +52,9 @@ export default function Footer() {
     }
 
     return(
-        <Content>
+        <Container>
             <Button><Link to={"/habitos"} data-identifier="habit-page-action">Hábitos</Link></Button>
-            <Progress>
+            <ProgressContainer>
                 <Link to={"/hoje"}>
                     <CircularProgressbar 
                         background
@@ -69,13 +69,13 @@ export default function Footer() {
                         })} 
                     />
                 </Link>
-            </Progress>
+            </ProgressContainer>
             <Button><Link to={"/historico"} data-identifier="historic-page-action">Histórico</Link></Button>
-        </Content>
+        </Container>
     )
 }
 
-const Content = styled.div`
+const Container = styled.div`
     display: flex;
     align-items: center;
     width: 100%;
@@ -99,7 +99,7 @@ const Button = styled.div`
     }
 `
 
-const Progress = styled.div`
+const ProgressContainer = styled.div`
     display: flex;
     width: 100px;
     height: 100px;

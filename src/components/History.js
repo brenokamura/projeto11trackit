@@ -1,17 +1,15 @@
-import Header from './shared/Header';
-import Footer from './shared/Footer';
-
 import { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Calendar from 'react-calendar';
-import 'react-calendar/dist/Calendar.css'
-
-import dayjs from 'dayjs';
-import 'dayjs/locale/pt-br.js';
-
 import axios from "axios";
 import styled from "styled-components";
 import UserContext from './context/UserContext';
+import Header from './header/Header';
+import Footer from './footer/Footer';
+
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'
+import dayjs from 'dayjs';
+import 'dayjs/locale/pt-br';
 
 const HISTORY_URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits/history/daily";
 
@@ -43,7 +41,6 @@ export default function History() {
             }
         }
         getHabitsList(config)
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     function getHabitsList(config) {
@@ -129,7 +126,7 @@ export default function History() {
     const Display = (() => {
         if(!dayClick && progressHistory.length > 0) {
             return (
-                <CalendarWrapper
+                <CalendarContainer
                     calendarType={"US"}
                     locale={"pt-br"}
                     onClickDay={(value) => HistoryOnClick(value)}
@@ -142,18 +139,18 @@ export default function History() {
         })
     
     return(
-        <Content>
+        <Container>
             <Header />
-            <PageTop>
+            <TopContainer>
                 <PageTitle>Histórico</PageTitle>
-            </PageTop>
+            </TopContainer>
             <Display />
             <Footer />
-        </Content>
+        </Container>
     )
 }
 
-const Content = styled.div`
+const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -166,7 +163,7 @@ const Content = styled.div`
     box-sizing: border-box;
 `
 
-const PageTop = styled.div`
+const TopContainer = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -203,7 +200,7 @@ const Template = styled.p`
     margin-bottom: 15px;
 `
 
-const CalendarWrapper = styled(Calendar)`
+const CalendarContainer = styled(Calendar)`
 	font-family: 'Lexend Deca';
     border: none;
     border-radius: 8px;

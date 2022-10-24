@@ -1,14 +1,13 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
-import Goals from "./Goals";
-import Header from "./shared/Header";
-import Home from "./Home";
-import Register from "./Register";
-import Track from "./Track";
-import History from "./History";
+import { UserContextProvider } from "./context/UserContext";
 
 import GlobalStyle from "../assets/GlobalStyles";
-import { UserContextProvider } from "./context/UserContext";
+import Habits from "./Habits";
+import Header from "./header/Header";
+import Home from "./Home";
+import Register from "./Register";
+import Today from "./Today";
+import History from "./History";
 
 export default function App() {
     return (
@@ -19,8 +18,8 @@ export default function App() {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/cadastro" element={<Register />} />
-                        <Route path="/habitos" element={<Goals />} />
-                        <Route path="/hoje" element={<Track />} />
+                        <Route path="/habitos" element={<Habits />} />
+                        <Route path="/hoje" element={<Today />} />
                         <Route path="/historico" element={<History />} />
                     </Routes>
             </BrowserRouter>

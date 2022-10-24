@@ -5,8 +5,8 @@ import 'dayjs/locale/pt-br';
 import { useState, useEffect, useContext } from 'react'
 import { useNavigate } from 'react-router-dom';
 
-import Header from './shared/Header'
-import Footer from './shared/Footer'
+import Header from './header/Header'
+import Footer from './footer/Footer'
 
 import axios from "axios";
 import styled from "styled-components";
@@ -35,7 +35,7 @@ function Task({ handleCheck, index, task }) {
     )
 }
 
-export default function Track() {
+export default function Today() {
     const navigate = useNavigate();
     const { userContext, setUserContext } = useContext(UserContext);
 

@@ -1,9 +1,12 @@
+import { Link, useNavigate } from "react-router-dom"
+import { useState, useEffect, useContext } from "react";
+import { ThreeDots } from "react-loader-spinner";
+
 import axios from "axios";
 import styled from "styled-components";
-import { ThreeDots } from "react-loader-spinner";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/trackit_logo.png"
+import UserContext from "./context/UserContext";
+
 
 const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up"
 

@@ -26,7 +26,7 @@ export default function Home() {
             const login = { email: parseUser.email, password: parseUser.password }
             userLogin(login);
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        
     }, [])
 
     function handleSubmit(e) {

@@ -1,22 +1,21 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import styled from "styled-components";
+import UserContext from "../context/UserContext";
+
 import header from '../../assets/trackit_header.png'
 import altPfp from '../../assets/android-chrome-512x512.png'
 
-import styled from "styled-components";
-
-import UserContext from "../context/UserContext";
-
 function Top({ pfp, display, setDisplay, logOff }) {
-    const Dropdown = (() => {
+    const Navbar = (() => {
         if(display) {
             return (
                 <>
-                    <ArrowUp />
-                    <ExitButton onClick={logOff} >Sair</ExitButton>
+                    <Container />
+                    <Button onClick={logOff} >Sair</Button>
                 </>)
         } else {
-            return <ExitIcon ><ion-icon name="exit-outline"></ion-icon></ExitIcon>
+            return <Icon ><ion-icon name="exit-outline"></ion-icon></Icon>
         }
     })
     return(
@@ -24,7 +23,7 @@ function Top({ pfp, display, setDisplay, logOff }) {
             <Logo src={header} alt="logo" />
             <Profile>
                 <img data-identifier="avatar" src={pfp} onClick={() => setDisplay(!display)} alt={altPfp} />
-                <Dropdown />
+                <Navbar />
             </Profile>
         </Content>
     );
@@ -80,7 +79,7 @@ const Profile = styled.div`
     }
 `
 
-const ArrowUp = styled.div`
+const Container = styled.div`
     width: 0; 
     height: 0; 
     border-left: 5px solid transparent;
@@ -92,7 +91,7 @@ const ArrowUp = styled.div`
     z-index: 1;
 `
 
-const ExitIcon = styled.div`
+const Icon = styled.div`
     width: 20px;
     height: 20px;
     font-size: 20px;
@@ -106,7 +105,7 @@ const ExitIcon = styled.div`
     z-index: 1;
 `
 
-const ExitButton = styled.div`
+const Button = styled.div`
     width: 60px;
     height: 30px;
     display: flex;

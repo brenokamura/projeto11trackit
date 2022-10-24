@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from 'react'
 import { ThreeDots } from "react-loader-spinner";
-
+import { useNavigate } from 'react-router-dom';
 import axios from "axios";
 import styled from "styled-components";
 import UserContext from './context/UserContext';
@@ -8,16 +8,14 @@ import UserContext from './context/UserContext';
 import dayjs from 'dayjs';
 import weekday from 'dayjs/plugin/weekday';
 import 'dayjs/locale/pt-br';
-
-import Header from './shared/Header'
-import Footer from './shared/Footer'
-import { useNavigate } from 'react-router-dom';
+import Header from './header/Header'
+import Footer from './footer/Footer'
 
 const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits"
 
-function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, setCreate, handleSubmit, interact }) {
+function Habit ({ IsLoading, form, title, setTitle, handleWeekday, create, setCreate, handleSubmit, interact }) {
     return(
-        <InputWrapper onSubmit={handleSubmit} interact={interact}>
+        <InputContainer onSubmit={handleSubmit} interact={interact}>
             <input data-identifier="input-habit-name"
                 type={'text'}
                 value={title}
@@ -26,7 +24,7 @@ function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, se
                 maxLength={64}
                 required
             />
-            <DayWrapper>
+            <DayContainer>
                 { 
                     form.map((item, index) =>
                         <Day data-identifier="week-day-btn"
@@ -37,16 +35,16 @@ function NewHabit ({ IsLoading, form, title, setTitle, handleWeekday, create, se
                             {item.day}
                         </Day>
                 )}
-            </DayWrapper>
-            <ButtonWrapper >
+            </DayContainer>
+            <ButtonContainer >
                 <Cancel data-identifier="cancel-habit-create-btn" onClick={() => setCreate(!create)}>cancelar</Cancel>
                 { <IsLoading /> }
-            </ButtonWrapper>
-        </InputWrapper>
+            </ButtonContainer>
+        </InputContainer>
     )
 }
 
-export default function Goals() {
+export default function Habits() {
     const navigate = useNavigate();
     const { userContext, setUserContext } = useContext(UserContext);
     const [interact, setInteract] = useState(true)
@@ -192,7 +190,7 @@ export default function Goals() {
     const HasData = (() => {
         if(data.length > 0) {
             return (data.map((item, index) => 
-            <CardWrapper key={index}>
+            <CardContainer key={index}>
                 <Card data-identifier="habit-name">{item.name}
                     <DelIcon>
                         <ion-icon data-identifier="delete-habit-btn" onClick={() => handleDelete(item.id)}
@@ -200,25 +198,25 @@ export default function Goals() {
                         </ion-icon>
                     </DelIcon>
                 </Card>
-                <DayWrapper>
+                <DayContainer>
                     <SelectedDays days={item.days} />
-                </DayWrapper>
-            </CardWrapper>))
+                </DayContainer>
+            </CardContainer>))
         }
         return (<Template data-identifier="no-habit-message">Você não tem nenhum hábito cadastrado ainda. Adicione um hábito para começar a trackear!</Template>)  
     })
 
     return (
-        <Content>
+        <Container>
             <Header />
-            <PageTop>
+            <TopContainer>
                 <PageTitle>Meus hábitos</PageTitle>
-                <AddIcon><ion-icon data-identifier="create-habit-btn" onClick={() => setCreate(!create)} name="add-outline"></ion-icon></AddIcon>
-            </PageTop>
+                <Icon><ion-icon data-identifier="create-habit-btn" onClick={() => setCreate(!create)} name="add-outline"></ion-icon></Icon>
+            </TopContainer>
             <List>
                 {
                 create 
-                    ? <NewHabit 
+                    ? <Habit 
                         IsLoading={IsLoading}
                         handleSubmit={handleSubmit}
                         title={title}
@@ -234,11 +232,11 @@ export default function Goals() {
                 <HasData />
             </List>
             <Footer />
-        </Content>
+        </Container>
     )
 }
 
-const Content = styled.div`
+const Container = styled.div`
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -251,7 +249,7 @@ const Content = styled.div`
     box-sizing: border-box;
 `
 
-const PageTop = styled.div`
+const TopContainer = styled.div`
     display: flex;
     width: 100%;
     min-height: 35px;
@@ -268,7 +266,7 @@ const PageTitle = styled.h1`
     color: #126BA5;
 `
 
-const AddIcon = styled.div`
+const Icon = styled.div`
     display: flex;
     justify-content: center;
     align-items: center;
@@ -301,7 +299,7 @@ const List = styled.ul`
     overflow-y: scroll;
 `
 
-const CardWrapper = styled.li`
+const CardContainer = styled.li`
     display: flex;
     flex-direction: column;
     width: 95%;
@@ -330,7 +328,7 @@ const Template = styled.p`
     margin: 15px 0;
 `
 
-const InputWrapper = styled.form`
+const InputContainer = styled.form`
     display: flex;
     flex-direction: column;
     justify-content: space-between;
@@ -362,7 +360,7 @@ const InputWrapper = styled.form`
     }
 `
 
-const ButtonWrapper = styled.div`
+const ButtonContainer = styled.div`
     display: flex;
     width: 100%;
     height: 50px;
@@ -405,7 +403,7 @@ const Cancel = styled.button`
     border-radius: 5px;
 `
 
-const DayWrapper = styled.div`
+const DayContainer = styled.div`
     display: flex;
     align-items: flex-end;
     width: 90%;
