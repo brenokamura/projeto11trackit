@@ -1,155 +1,248 @@
+import dayjs from 'dayjs';
+import weekday from 'dayjs/plugin/weekday'
+import 'dayjs/locale/pt-br';
+
+import { useState, useEffect, useContext } from 'react'
+import { useNavigate } from 'react-router-dom';
+
+import Header from './shared/Header'
+import Footer from './shared/Footer'
+
 import axios from "axios";
 import styled from "styled-components";
-import { ThreeDots } from "react-loader-spinner";
-import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import logo from "../assets/trackit_logo.png"
+import UserContext from './context/UserContext';
 
-const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/auth/sign-up"
 
-export default function Register() {
-    const navigate = useNavigate();
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [userName, setUserName] = useState('')
-    const [picture, setPicture] = useState('')
-    const [interact, setInteract] = useState(true)
+const URL = "https://mock-api.bootcamp.respondeai.com.br/api/v2/trackit/habits"
+const ROUTE_TODAY = "/today"
+const ROUTE_CHECK = "/check"
+const ROUTE_UNCHECK = "/uncheck"
 
-    function userRegister(e) {
-        e.preventDefault();
-        e.target.blur();
-        const registry = { email: email, name: userName, image: picture, password: password }
-        setInteract(false)
+function Task({ handleCheck, index, task }) {
+    const { highestSequence: highest , currentSequence: sequence, done, name } = task
 
-        const promise = axios.post(URL, registry);
-
-        promise.then((res) => {
-            toggleInputs();
-            navigate("/")
-        });
-        promise.catch((err) => { alert(err.response.data.message); setEmail(''); setInteract(true); });
-    }
-
-    function toggleInputs() {
-        setInteract(true);
-        setEmail('');
-        setPassword('');
-        setUserName('');
-        setPicture('');
-    }
-
-    const IsLoading = (() => {
-        if(interact) {
-            return (<Button type={'submit'} interact={interact}>Cadastrar</Button>)
-        }
-        return <Button><ThreeDots height="15px" width="60px" color="#FFFFFF" /></Button>
-    })
-
-    return (
-        <Container>
-            <Logo src={logo} alt="Logotipo da aplicação" />
-            <InputWrapper onSubmit={userRegister}>
-                <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type={'email'}
-                    placeholder='email'
-                    required
-                />
-                <input
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    type={'password'}
-                    placeholder='senha'
-                    required
-                />
-                <input
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    type={'text'}
-                    placeholder='nome'
-                    required
-                />
-                <input
-                    value={picture}
-                    onChange={(e) => setPicture(e.target.value)}
-                    type={'text'}
-                    placeholder='foto'
-                    pattern={"^https?://(?:[a-z-]+.)+[a-z]{2,6}(?:/[^/#?]+)+.(?:jpe?g|gif|png)$"}
-                    title={"Link de imagem terminado com formato de imagem (jpg, png, etc.)"}
-                    required
-                />
-                <IsLoading />
-            </InputWrapper>
-            <Text><Link to="/">Já tem uma conta? Faça login</Link></Text>
-        </Container>)
+    const color = (() => (highest !== 0 && sequence === highest && done) ? true : false)
+    const Template = (({ num, color }) => num !== 1 ? <Record setColor={color} >{num} dias</Record> : <Record setColor={color} >{num} dia</Record>)
+    return(
+        <CardWrapper>
+            <Card>
+                <Title>{name}</Title>
+                <Streak>Sequencia atual: {<Template color={done} num={sequence} />}</Streak>
+                <Streak>Seu recorde: {<Template color={color()} num={highest} />}</Streak>
+            </Card>
+            <Icon colorPicker={done}><ion-icon onClick={() => handleCheck(index)} name="checkbox"></ion-icon></Icon>
+        </CardWrapper>
+    )
 }
 
-const Container = styled.div`
+export default function Track() {
+    const navigate = useNavigate();
+    const { userContext, setUserContext } = useContext(UserContext);
+
+    const [data, setData] = useState([]);
+    const [interact, setInteract] = useState(true);
+    const [calendar, ] = useState(getDate);
+
+    function getDate() {
+        dayjs.extend(weekday)
+        const rawDate = dayjs().locale('pt-br').format("dddd D/MM")
+        return formatDate(rawDate)
+    }
+
+    function formatDate(string) {
+        const split = string.indexOf('-');
+        const blank = string.indexOf(' ');
+        const day = string.slice(blank);
+        let weekday = string.slice(0, blank);
+        if(split !== -1) {
+            weekday = string.slice(0, split);
+        }
+        weekday = weekday.replace(string[0], string[0].toUpperCase());
+        return `${weekday},${day}`;
+    }
+
+    useEffect(() => {
+        getTodayData()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    function getTodayData() {
+        let dataToken;
+        if(!userContext.hasOwnProperty("token")) {
+            let data = localStorage.getItem("login")
+            if(data === null) {
+                navigate("/")
+                return
+            }
+            data = JSON.parse(data)
+            dataToken = data.token
+            const userImg = data.image
+            const userToken = dataToken
+            setUserContext({ token: userToken, image: userImg })
+        } else {
+            dataToken = userContext.token
+        }
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${dataToken}`
+            }
+        }
+        getProgress(config)
+    }
+    
+    function getProgress(config) {
+        const promise = axios.get(URL+ROUTE_TODAY, config)
+        promise.then((res) => {
+            setData(res.data);
+        }).catch((err) => alert(err.response.data.message));
+    }
+
+    function handleCheck(taskIndex) {
+        if(!interact) {
+            return;
+        }
+        setInteract(false)
+        const config = {
+            headers: {
+                "Authorization": `Bearer ${userContext.token}`
+            }
+        }
+        const reqData = {...data[taskIndex]}
+        const route = reqData.done ? ROUTE_UNCHECK : ROUTE_CHECK
+        const promise = axios.post(URL+`/${reqData.id}`+route, {}, config)
+        promise.then(() => { getTodayData(); setInteract(true)})
+        promise.catch((err) => { alert(err.response.data.message); setInteract(true); })
+    }
+
+   function Progress() {
+        const doneList = data.filter((task) => task.done ? task : null)
+        const percent = (doneList.length/data.length)*100
+        if (percent > 0) {
+            return <DailyProgress color={percent} >{Math.round(percent)}% dos hábitos concluídos</DailyProgress>
+        }
+        return <DailyProgress>Nenhum hábito concluído ainda</DailyProgress>
+    }
+
+    const Today = (() => {
+        if(data.length === 0)
+            return null
+        else {
+            return (
+                data.map((task, index) => 
+                    <Task 
+                        key={index}
+                        task={task}
+                        index={index}
+                        handleCheck={handleCheck}
+                    />))
+        }
+    })
+
+    return(
+    <Content>
+        <Header />
+        <PageTop>
+            <PageTitle>{calendar}</PageTitle>
+        </PageTop>
+        <Progress />
+        <List>
+            <Today />
+        </List>
+        <Footer />
+    </Content>)
+}
+
+const Content = styled.div`
     display: flex;
     flex-direction: column;
+    width: 100%;
+    height: 76vh;
+    margin: 80px 0;
+    padding: 0 2.5vw;
+    font-size: 18px;
+    color: #666666;
+    background-color: #F2F2F2;
+    box-sizing: border-box;
+`
+
+const PageTop = styled.div`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 35px;
+    margin-top: 15px;
+    margin-bottom: 5px;
+    justify-content: flex-end;
+    align-items: flex-start;
+`
+
+const PageTitle = styled.h1`
+    display: flex;
+    font-size: 23px;
+    color: #126BA5;
+`
+
+const DailyProgress = styled.h3`
+    display: flex;
+    font-size: 18px;
+    margin-bottom: 15px;
+    color: ${ ({color}) => color >= 50 ? "#8FC549" : "#BABABA"};
+`
+
+const List = styled.ul`
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    margin: 5px 0;
     justify-content: flex-start;
     align-items: center;
-    width: 100%;
-    margin-top: 12vh;
+    overflow-y: scroll;
 `
 
-const Logo = styled.img`
-`
-
-const InputWrapper = styled.form`
+const CardWrapper = styled.li`
     display: flex;
-    flex-direction: column;
     justify-content: space-between;
     align-items: center;
-    width: 100%;
-    padding: 3vh 5vh;
-    box-sizing: border-box;
-    input {
-        display: flex;
-        pointer-events: ${ ({ interact }) => !interact ? 'auto' : 'none' };
-        background-color: ${ ({ interact }) => !interact ? '#FFFFFF' : '#F2F2F2' };
-        color: ${ ({ interact }) => !interact ? '#666666' : '#AFAFAF' };
-        width: 100%;
-        height: 40px;
-        margin: 5px 0;
-        padding: 4px 12px;
-        border: 1px solid #D4D4D4;
-        border-radius: 5px;
-        box-sizing: border-box;
-        &::placeholder {
-            font-family: 'Lexend Deca';
-            font-size: 20px;
-            color: #DBDBDB
-        }
-    }
-`
-
-const Button = styled.button`
-	font-family: 'Lexend Deca';
-    font-size: 21px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    background-color: ${ ({ interact }) => interact ? '#52B6FF' : '#52B6FF70' }; ;
-    color: #FFFFFF;
-    width: 100%;
-    height: 40px;
-    margin: 5px 0;
-    padding: 4px 16px;
-    border: 1px solid #D4D4D4;
+    width: 95%;
+    min-height: 100px;
+    background-color: #FFFFFF;
+    margin: 3px 3px;
+    padding: 4px 8px;
     border-radius: 5px;
     box-sizing: border-box;
 `
 
-const Text = styled.p`
-    font-size: 14px;
-    color: #52B6FF;
-    text-decoration: underline;
-    a {
-        font-size: 14px;
-        color: #52B6FF;
-        text-decoration: underline;
-    }
+const Card = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    width: 90%;
+    min-height: 35px;
+    margin: 10px 10px 5px 0;
+    padding: 3px 0;
+    box-sizing: border-box;
+`
+
+const Title = styled.h2`
+    display: flex;
+    margin-bottom: 10px;
+    font-size: 20px;
+`
+
+const Streak = styled.p`
+    font-size: 13px;
+`
+
+const Record = styled.strong`
+    color: ${ ({ setColor } ) => setColor ? "#8FC549" : "#BABABA" };
+`
+
+const Icon = styled.div`
+    width: 70px;
+    height: 70px;
+    font-size: 70px;
+    color: ${ ({ colorPicker }) => colorPicker ? '#8FC549' : "#BABABA" };
 `

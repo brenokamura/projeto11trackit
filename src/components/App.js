@@ -7,7 +7,7 @@ import Register from "./Register";
 import Track from "./Track";
 import History from "./History";
 
-import GlobalStyle from "../assets/GlobalStyle";
+import GlobalStyle from "../assets/GlobalStyles";
 import { UserContextProvider } from "./context/UserContext";
 
 export default function App() {

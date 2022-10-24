@@ -7,7 +7,7 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css'
 
 import dayjs from 'dayjs';
-import 'dayjs/locale/pt-br';
+import 'dayjs/locale/pt-br.js';
 
 import axios from "axios";
 import styled from "styled-components";
